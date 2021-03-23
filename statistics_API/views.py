@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.permissions import BasePermission, IsAuthenticated
 
-from .serializers import ExpenseSerializer
+from .serializers import ExpenseSerializer, StatsSerializer
 from expenses.models import Expense 
 # Create your views here.
 
@@ -17,8 +17,12 @@ class PostUserWriteExpense(BasePermission):
 class ExpensesList(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = ExpenseSerializer
-    queryset = Expense.objects.all()
 
     def get_queryset(self):
-        print(self.request.user)
-        return Expense.objects.all().filter(user=self.request.user)
+        user=self.request.user
+        return user.expense_set.all()
+
+class ExpenseStats(generics.RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = StatsSerializer
+    

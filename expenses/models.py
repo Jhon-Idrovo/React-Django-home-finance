@@ -23,7 +23,7 @@ class ExpenseDescription(models.Model):
 class Expense(models.Model):
     class UserExpensesManager(models.Manager):
         def get_queryset(self):
-            return super().get_queryset().filter(user=PlatformUser)
+            return super().get_queryset().filter()
             
     exp_type= models.ForeignKey(ExpenseType, on_delete=models.CASCADE)
     description = models.ForeignKey(ExpenseDescription, on_delete=models.CASCADE)

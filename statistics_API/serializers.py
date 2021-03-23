@@ -8,3 +8,9 @@ class ExpenseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Expense
         exclude = ['user']
+
+
+class StatsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Expense
+        
