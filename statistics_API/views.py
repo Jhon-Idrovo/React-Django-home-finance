@@ -5,20 +5,13 @@ from django.contrib.auth.hashers import make_password
 from django.db.models import Sum
 
 from rest_framework import generics, status
-from rest_framework.permissions import BasePermission, IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .serializers import ExpenseSerializer, StatsSerializer, RegisterUserSerializer
 from expenses.models import Expense 
 # Create your views here.
-
-# class PostUserWriteExpense(BasePermission):
-#     message = 'No tiene acceso a este contenido'
-
-#     def has_object_permission(self, request, view, obj):
-#         print(request)
-#         return request.user == obj.user
 
 
 class ExpensesList(generics.ListCreateAPIView):
@@ -31,10 +24,8 @@ class ExpensesList(generics.ListCreateAPIView):
 
 class ExpenseStats(APIView):
     def post(self, request):
-        print(request.data)
         user = request.user
         types = user.expensetype_set.all()
-        print(types)
         initial_date = datetime.date.fromisoformat(request.data['init'])
         ending_date = datetime.date.fromisoformat(request.data['end'])
 
@@ -74,24 +65,8 @@ class ExpenseStats(APIView):
                 #add the sum to the serie
                 values['data'].append(sum['amount__sum'])
                 
-            series.append(values)
         data = {'series':series,'labels':labels}
-        print(data)
         
         return Response(data,status=status.HTTP_200_OK)
 
     
-class CreateUser(APIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request, format='json'):
-        print(request.data)
-        data = request.data
-        reg_serializer = RegisterUserSerializer(data=data)
-        if reg_serializer.is_valid():
-            password = reg_serializer.validated_data.get('password')
-            reg_serializer.validated_data['password']=make_password(password)
-            new_user = reg_serializer.save()
-            if new_user:
-                return Response(status=status.HTTP_201_CREATED)
-        return Response(reg_serializer.errors,status=status.HTTP_400_BAD_REQUEST)
